@@ -3,11 +3,12 @@ import { ref, onMounted } from 'vue';
 import api from '../api/index.js';
 
 import ProdModal from '../components/ProdModal.vue';
+import DelModal from '../components/DelModal.vue';
 
 import { Modal } from 'bootstrap';
 
 export default {
-  components: { ProdModal },
+  components: { ProdModal, DelModal },
   setup() {
     let productModal = ref(null);
     let delProductModal = ref(null);
@@ -43,12 +44,12 @@ export default {
       //   keyboard: false,
       // });
 
-      delProductModal.value = new Modal(
-        document.getElementById('delProductModal'),
-        {
-          keyboard: false,
-        }
-      );
+      // delProductModal.value = new Modal(
+      //   document.getElementById('delProductModal'),
+      //   {
+      //     keyboard: false,
+      //   }
+      // );
 
       detailProdsModal.value = new Modal(
         document.getElementById('detailProdsModal'),
@@ -77,22 +78,7 @@ export default {
           : { ...item };
 
       if (status === 'delete') {
-        delProductModal.value.show();
-      }
-    };
-
-    // 刪除商品
-    const delProduct = async () => {
-      try {
-        const res = await api.products.delProducts(tempProduct.value.id);
-
-        alert(res.message);
-
-        getData();
-
-        delProductModal.value.hide();
-      } catch (err) {
-        alert(err.message);
+        // delProductModal.value.show();
       }
     };
 
@@ -110,7 +96,6 @@ export default {
       tempProduct,
       isNew,
       openModal,
-      delProduct,
       createImages,
       getData,
     };
@@ -154,24 +139,6 @@ export default {
                 <td>
                   <span v-if="item.is_enabled" class="text-success">啟用</span>
                   <span v-else>未啟用</span>
-                  <!-- <label
-                    class="form-check-label"
-                    :for="`switchCheckBox${index}`"
-                  >
-                    <span v-if="item.is_enabled" class="checked">啟用</span>
-                    <span v-else>未啟用</span>
-                  </label> -->
-                  <!-- <div class="form-check form-switch">
-                    <input
-                      class="form-check-input form-check-input-checked-bg-color-success"
-                      type="checkbox"
-                      role="switch"
-                      :id="`switchCheckBox${index}`"
-                      v-model="products[index].is_enabled"
-                      :true-value="1"
-                      :false-value="0"
-                    />
-                  </div> -->
                 </td>
                 <td>
                   <button
@@ -186,6 +153,8 @@ export default {
                   <button
                     type="button"
                     class="btn btn-outline-danger btn-sm me-2 mb-md-1"
+                    data-bs-target="#delProductModal"
+                    data-bs-toggle="modal"
                     @click="openModal('delete', item)"
                   >
                     刪除
@@ -218,48 +187,11 @@ export default {
       @update="getData"
     />
     <!-- delModal -->
-    <div
-      id="delProductModal"
-      ref="delProductModal"
-      class="modal fade"
-      tabindex="-1"
-      aria-labelledby="delProductModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0">
-          <div class="modal-header bg-primary text-white">
-            <h5 id="delProductModalLabel" class="modal-title">
-              <span>刪除產品</span>
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            是否刪除
-            <strong class="text-danger">{{ tempProduct.title }}</strong>
-            商品
-            <br />刪除後將無法恢復
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-outline-danger"
-              data-bs-dismiss="modal"
-            >
-              取消
-            </button>
-            <button type="button" class="btn btn-success" @click="delProduct">
-              確認刪除
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <DelModal
+      v-model:id="tempProduct.id"
+      v-model:product-title="tempProduct.title"
+      @update="getData"
+    />
 
     <!-- detailProdsModal -->
     <div

@@ -125,7 +125,7 @@ export default {
                 <div
                   class="mb-1"
                   v-for="(image, index) in tempProduct.imagesUrl"
-                  :key="index"
+                  :key="`${image}index`"
                 >
                   <div class="mb-3">
                     <label for="imageUrl" class="form-label">圖片網址</label>
