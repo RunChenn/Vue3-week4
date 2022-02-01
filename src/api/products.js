@@ -2,8 +2,12 @@ import { axiosInstance, apiPath } from '../utils/axios.js';
 
 export default {
   // 取得 商品資訊
-  getProducts: () => {
+  getProductsAll: () => {
     return axiosInstance.get(`/api/${apiPath}/admin/products/all`);
+  },
+  // 取得 商品資訊
+  getProducts: (page) => {
+    return axiosInstance.get(`/api/${apiPath}/admin/products?page=${page}`);
   },
   // 新增 商品資訊
   addProducts: (data) => {

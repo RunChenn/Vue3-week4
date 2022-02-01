@@ -4,16 +4,13 @@ import api from '../api/index.js';
 
 import ProdModal from '../components/ProdModal.vue';
 import DelModal from '../components/DelModal.vue';
+import Pagination from '../components/Pagination.vue';
 
-import { Modal } from 'bootstrap';
+// import { Modal } from 'bootstrap';
 
 export default {
-  components: { ProdModal, DelModal },
+  components: { ProdModal, DelModal, Pagination },
   setup() {
-    let productModal = ref(null);
-    let delProductModal = ref(null);
-    let detailProdsModal = ref(null);
-
     let products = ref([]);
 
     let prodInfo = ref({});
@@ -24,40 +21,27 @@ export default {
 
     let tempProduct = ref({ imagesUrl: [], id: '' });
 
+    let pagination = ref({});
+
     const prodsDetail = (item) => {
       prodInfo.value = item;
-      detailProdsModal.value.show();
     };
 
     // 載入所有商品
-    const getData = async () => {
+    const getData = async (page = 1) => {
       try {
-        const prodsData = await api.products.getProducts();
+        const prodsData = await api.products.getProducts(page);
+
+        console.log(prodsData);
+
         products.value = prodsData.products;
+        pagination.value = prodsData.pagination;
       } catch (err) {
         alert(err.message);
       }
     };
 
     onMounted(async () => {
-      // productModal.value = new Modal(document.getElementById('productModal'), {
-      //   keyboard: false,
-      // });
-
-      // delProductModal.value = new Modal(
-      //   document.getElementById('delProductModal'),
-      //   {
-      //     keyboard: false,
-      //   }
-      // );
-
-      detailProdsModal.value = new Modal(
-        document.getElementById('detailProdsModal'),
-        {
-          keyboard: false,
-        }
-      );
-
       try {
         // 檢查權限
         await api.auth.checkAuth();
@@ -76,10 +60,6 @@ export default {
               imagesUrl: [],
             }
           : { ...item };
-
-      if (status === 'delete') {
-        // delProductModal.value.show();
-      }
     };
 
     // 新增圖片
@@ -98,6 +78,7 @@ export default {
       openModal,
       createImages,
       getData,
+      pagination,
     };
   },
 };
@@ -107,7 +88,7 @@ export default {
   <div>
     <div class="container">
       <div class="row py-1">
-        <div class="text-end mb-4">
+        <div class="text-end mb-3">
           <button
             type="button"
             class="btn btn-success"
@@ -124,7 +105,8 @@ export default {
           <table class="table table-hover">
             <thead>
               <tr>
-                <th scope="col">產品名稱</th>
+                <th scope="col">分類</th>
+                <th scope="col" class="text-start">產品名稱</th>
                 <th scope="col">原價</th>
                 <th scope="col">售價</th>
                 <th scope="col">是否啟用</th>
@@ -133,7 +115,8 @@ export default {
             </thead>
             <tbody>
               <tr v-for="item in products" :key="item.id">
-                <th scope="row">{{ item.title }}</th>
+                <td>{{ item.category }}</td>
+                <td class="text-start">{{ item.title }}</td>
                 <td>{{ item.origin_price }}</td>
                 <td>{{ item.price }}</td>
                 <td>
@@ -159,24 +142,12 @@ export default {
                   >
                     刪除
                   </button>
-                  <button
-                    type="button"
-                    class="btn btn-outline-success btn-sm me-2 mb-md-1"
-                    @click="prodsDetail(item)"
-                  >
-                    查看細節
-                  </button>
                 </td>
               </tr>
             </tbody>
           </table>
-          <p>
-            目前有
-            <span
-              ><strong>{{ Object.keys(products).length }}</strong></span
-            >
-            項產品
-          </p>
+
+          <Pagination v-model:pages="pagination" @update-pages="getData" />
         </div>
       </div>
     </div>
@@ -192,81 +163,6 @@ export default {
       v-model:product-title="tempProduct.title"
       @update="getData"
     />
-
-    <!-- detailProdsModal -->
-    <div
-      id="detailProdsModal"
-      ref="detailProdsModal"
-      class="modal fade text-start"
-      tabindex="-1"
-      aria-labelledby="detailProdsModalLabel"
-      aria-hidden="true"
-      data-bs-keyboard="false"
-    >
-      <div class="modal-dialog modal-dialog-scrollable modal-xl">
-        <div class="modal-content border-0">
-          <div class="modal-header bg-primary text-white">
-            <h5 id="detailProdsModalLabel" class="modal-title">
-              {{ prodInfo.title }}
-            </h5>
-            <button
-              type="button"
-              class="btn-close text-white"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <!-- <h4>{{ prodInfo.title }}</h4> -->
-            <div v-if="prodInfo.title">
-              <div class="card mb-3">
-                <img
-                  :src="prodInfo.imageUrl"
-                  class="card-img-top primary-image"
-                  alt="主圖"
-                />
-                <div class="card-body">
-                  <h5 class="card-title">
-                    {{ prodInfo.title }}
-                    <span class="badge bg-primary ms-2">{{
-                      prodInfo.category
-                    }}</span>
-                  </h5>
-                  <p class="card-text">商品描述：{{ prodInfo.description }}</p>
-                  <p class="card-text">商品內容：{{ prodInfo.content }}</p>
-                  <div class="d-flex">
-                    <p class="card-text me-2 text-danger">
-                      ${{ prodInfo.price }}
-                    </p>
-                    <p class="card-text text-black-50">
-                      <del>{{ prodInfo.origin_price }}</del>
-                    </p>
-                    {{ prodInfo.unit }} / 元
-                  </div>
-                </div>
-              </div>
-              <span v-for="image in prodInfo.imagesUrl" :key="image">
-                <img
-                  v-if="image"
-                  :src="image"
-                  :alt="prodInfo.title"
-                  class="images m-2"
-                />
-              </span>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-success mx-auto"
-              data-bs-dismiss="modal"
-            >
-              關閉
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
