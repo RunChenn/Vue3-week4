@@ -24,7 +24,6 @@ export default {
   },
   // 上傳 圖片
   uploadImg: (formData) => {
-    console.log(formData);
     return axiosInstance.post(`/api/${apiPath}/admin/upload`, formData);
   },
 };

@@ -6,8 +6,6 @@ import ProdModal from '../components/ProdModal.vue';
 import DelModal from '../components/DelModal.vue';
 import Pagination from '../components/Pagination.vue';
 
-// import { Modal } from 'bootstrap';
-
 export default {
   components: { ProdModal, DelModal, Pagination },
   setup() {
@@ -31,8 +29,6 @@ export default {
     const getData = async (page = 1) => {
       try {
         const prodsData = await api.products.getProducts(page);
-
-        console.log(prodsData);
 
         products.value = prodsData.products;
         pagination.value = prodsData.pagination;

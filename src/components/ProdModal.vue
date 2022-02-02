@@ -25,11 +25,7 @@ export default {
     },
   },
   setup(props, { emit }) {
-    console.log(props.tempProduct);
-
     let productModal = ref(null);
-
-    // let tempProduct = ref({ imagesUrl: [], id: '' });
 
     onMounted(async () => {
       productModal.value = new Modal(document.getElementById('productModal'), {
@@ -39,7 +35,6 @@ export default {
 
     // 新增/編輯 商品
     const updateProduct = async () => {
-      console.log(props.tempProduct);
       // 新增
       if (props.isNew) {
         try {
@@ -304,6 +299,40 @@ export default {
                     required
                   />
                 </div>
+                <div class="mb-3">
+                  <label for="price" class="form-label">庫存數量</label>
+                  <input
+                    id="price"
+                    v-model.number="tempProduct.inventory"
+                    type="number"
+                    min="0"
+                    class="form-control"
+                    placeholder="請輸入庫存數量"
+                    required
+                  />
+                </div>
+                <!-- 未來會用到 -->
+                <!-- <div class="mb-3">
+                  <div class="form-label">尺寸</div>
+                  <div
+                    class="btn-group"
+                    role="group"
+                    aria-label="Basic radio toggle button group"
+                  >
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="size"
+                      id="size-s"
+                      autocomplete="off"
+                      v-model="tempProduct.size"
+                      value="S"
+                    />
+                    <label class="btn btn-outline-primary" for="size-s"
+                      >S</label
+                    >
+                  </div>
+                </div> -->
               </div>
               <hr />
 
@@ -364,4 +393,16 @@ export default {
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.btn-group > .btn:not(:last-child):not(.dropdown-toggle),
+.btn-group > .btn-group:not(:last-child) > .btn,
+.btn-group > .btn:nth-child(n + 3),
+.btn-group > :not(.btn-check) + .btn,
+.btn-group > .btn-group:not(:first-child) > .btn {
+  // border-top-right-radius: 0.25rem;
+  // border-bottom-right-radius: 0.25rem;
+  border-radius: 0.25rem;
+  margin-right: 10px;
+  min-width: 45px;
+}
+</style>

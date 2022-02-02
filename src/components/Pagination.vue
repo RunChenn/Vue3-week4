@@ -1,5 +1,5 @@
 <script>
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 
 export default {
   props: {
@@ -9,8 +9,6 @@ export default {
     },
   },
   setup(props, { emit }) {
-    console.log(props.pages);
-
     onMounted(async () => {});
 
     const updatePages = (item) => {
