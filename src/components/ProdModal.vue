@@ -74,8 +74,55 @@ export default {
       }
     };
 
+    // 上傳圖片;
+    const oneFileInput = ref(null);
+    const fileInput = ref(null);
+
+    const upload = async (status) => {
+      if (status === 'oneImage') {
+        const file = oneFileInput.value.files[0];
+
+        const formData = new FormData();
+
+        formData.append('file-to-upload', file);
+
+        try {
+          const res = await api.products.uploadImg(formData);
+
+          const { imageUrl } = res;
+
+          props.tempProduct.imageUrl = imageUrl;
+        } catch (err) {
+          alert(err.message);
+        }
+
+        return;
+      }
+
+      props.tempProduct.imagesUrl = [];
+
+      for (let i = 0; i < fileInput.value.files.length; i++) {
+        const formData = new FormData();
+
+        formData.append('file-to-upload', fileInput.value.files[i]);
+
+        try {
+          const res = await api.products.uploadImg(formData);
+
+          const { imageUrl } = res;
+
+          props.tempProduct.imagesUrl.push(imageUrl);
+        } catch (err) {
+          alert(err.message);
+        }
+      }
+    };
+
     return {
       updateProduct,
+      oneFileInput,
+      fileInput,
+      upload,
     };
   },
 };
@@ -111,23 +158,49 @@ export default {
             <div class="col-sm-4">
               <div class="mb-3">
                 <label for="imageUrl" class="form-label">主要圖片</label>
-                <input
+                <div class="mb-3">
+                  <!-- <label for="oneFileInput" class="form-label">上傳圖片</label> -->
+                  <input
+                    class="form-control"
+                    type="file"
+                    id="oneFileInput"
+                    ref="oneFileInput"
+                    @change="upload('oneImage')"
+                  />
+                </div>
+                <!-- <input
+                  v-if="tempProduct.imageUrl"
                   v-model="tempProduct.imageUrl"
                   type="text"
                   class="form-control mb-2"
                   placeholder="請輸入圖片連結"
                   required
+                /> -->
+                <img
+                  class="img-fluid"
+                  v-if="tempProduct.imageUrl"
+                  :src="tempProduct.imageUrl"
                 />
-                <img class="img-fluid" :src="tempProduct.imageUrl" />
               </div>
               <h3 class="mb-3">多圖新增</h3>
+              <div class="mb-3">
+                <!-- <label for="fileInput" class="form-label">上傳圖片</label> -->
+                <input
+                  class="form-control"
+                  type="file"
+                  id="fileInput"
+                  ref="fileInput"
+                  multiple
+                  @change="upload('multipleImage')"
+                />
+              </div>
               <div v-if="Array.isArray(tempProduct.imagesUrl)">
                 <div
                   class="mb-1"
                   v-for="(image, index) in tempProduct.imagesUrl"
                   :key="`${image}index`"
                 >
-                  <div class="mb-3">
+                  <!-- <div class="mb-3">
                     <label for="imageUrl" class="form-label">圖片網址</label>
                     <input
                       v-model="tempProduct.imagesUrl[index]"
@@ -135,10 +208,10 @@ export default {
                       class="form-control"
                       placeholder="請輸入圖片連結"
                     />
-                  </div>
+                  </div> -->
                   <img class="img-fluid" :src="image" />
                 </div>
-                <div
+                <!-- <div
                   v-if="
                     !tempProduct.imagesUrl.length ||
                     tempProduct.imagesUrl[tempProduct.imagesUrl.length - 1]
@@ -158,7 +231,7 @@ export default {
                   >
                     刪除圖片
                   </button>
-                </div>
+                </div> -->
               </div>
               <div v-else>
                 <button

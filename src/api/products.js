@@ -22,4 +22,9 @@ export default {
     // const pathName = path ? path : apiPath;
     return axiosInstance.delete(`/api/${apiPath}/admin/product/${id}`);
   },
+  // 上傳 圖片
+  uploadImg: (formData) => {
+    console.log(formData);
+    return axiosInstance.post(`/api/${apiPath}/admin/upload`, formData);
+  },
 };
